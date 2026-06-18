@@ -17,6 +17,8 @@ x-airflow-common:
     - postgres
 
 services:
+
+  # --- Postgres réservé à Airflow (ne pas toucher) ---
   postgres:
     image: postgres:14
     environment:
@@ -27,6 +29,18 @@ services:
       - "${POSTGRES_PORT}:5432"
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
+
+  # --- Postgres dédié à ton projet data ---
+  postgres_data:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: ${DATA_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${DATA_POSTGRES_PASSWORD}
+      POSTGRES_DB: ${DATA_POSTGRES_DB}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data-volume:/var/lib/postgresql/data
 
   airflow-webserver:
     <<: *airflow-common
@@ -55,3 +69,4 @@ services:
 
 volumes:
   postgres-db-volume:
+  postgres-data-volume:
